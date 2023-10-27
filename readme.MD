@@ -44,3 +44,15 @@ System.out.println("\ntestWith parallel Streams & Fork join response time in ms 
 
 * List - preserves order
 * Set - Doesn't preserve order
+
+## Collect vs reduce
+
+```java
+
+itemInCartList.stream().map(itemInCart -> itemInCart.getPrice() * itemInCart.getQuantity()).reduce(0d, Double::sum);
+
+```
+
+```java
+Arrays.asList("Bhaskar Sarma".toCharArray()).parallelStream().map(String::valueOf).collect(Collectors.joining())
+```

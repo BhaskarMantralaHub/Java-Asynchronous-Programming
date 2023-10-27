@@ -4,7 +4,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.bhaskarmantralahub.practice.WaitUtil.stopWatch;
@@ -13,7 +15,7 @@ public class CheckoutService {
 
     private PriceValidatorService priceValidatorService = new PriceValidatorService();
 
-    public Pair<Pair<CheckoutResponse, String>, List<ItemInCart>> checkout(Cart cart, boolean isParallelStream) {
+    public Pair<Pair<CheckoutResponse, String>, Pair<List<ItemInCart>, Double>> checkout(Cart cart, boolean isParallelStream) {
 
         Stream<ItemInCart> stream = cart.getItemsInCart()
                 .stream();
@@ -24,10 +26,17 @@ public class CheckoutService {
                 .peek(itemInCart -> itemInCart.setExpired(!priceValidatorService.isPriceValid(itemInCart))).filter(ItemInCart::isExpired).toList();
 
         if (!expiredItemsInCart.isEmpty()) {
-            return Pair.of(Pair.of(CheckoutResponse.FAILURE, "Some of the items in the cart are expired"), expiredItemsInCart);
+            return Pair.of(Pair.of(CheckoutResponse.FAILURE, "Some of the items in the cart are expired"), Pair.of(expiredItemsInCart, null));
         }
 
-        return Pair.of(Pair.of(CheckoutResponse.SUCCESS, "Checked out successfully"), cart.getItemsInCart());
+        double finalPrice = calculateFinalPrice(cart.getItemsInCart());
+        System.out.println("Total Price is " + finalPrice);
+        return Pair.of(Pair.of(CheckoutResponse.SUCCESS, "Checked out successfully"), Pair.of(cart.getItemsInCart(), finalPrice));
+    }
+
+    public double calculateFinalPrice(List<ItemInCart> itemInCartList) {
+//        return itemInCartList.stream().map(itemInCart -> itemInCart.getPrice() * itemInCart.getQuantity()).mapToDouble(Double::doubleValue).sum();
+        return itemInCartList.stream().map(itemInCart -> itemInCart.getPrice() * itemInCart.getQuantity()).reduce(0d, Double::sum);
     }
 
     @DataProvider(name = "data-provider")
@@ -47,7 +56,7 @@ public class CheckoutService {
         List<ItemInCart> itemInCartList = List.of(ItemInCart.builder().id(id1).name("item1").price(100).quantity(1).build(),
                 ItemInCart.builder().id(id2).name("item10").price(70).quantity(5).build());
 
-        Pair<Pair<CheckoutResponse, String>, List<ItemInCart>> checkoutResponse = this.checkout(Cart.builder().sessionId(1).itemsInCart(itemInCartList).build(), false);
+        Pair<Pair<CheckoutResponse, String>, Pair<List<ItemInCart>, Double>> checkoutResponse = this.checkout(Cart.builder().sessionId(1).itemsInCart(itemInCartList).build(), false);
 
         Pair<CheckoutResponse, String> response = checkoutResponse.getLeft();
         stopWatch.stop();
@@ -65,7 +74,7 @@ public class CheckoutService {
         List<ItemInCart> itemInCartList = List.of(ItemInCart.builder().id(10).name("item1").price(100).quantity(1).build(),
                 ItemInCart.builder().id(12).name("item10").price(70).quantity(5).build());
 
-        Pair<Pair<CheckoutResponse, String>, List<ItemInCart>> checkoutResponse = this.checkout(Cart.builder().sessionId(1).itemsInCart(itemInCartList).build(), isParallelStream);
+        Pair<Pair<CheckoutResponse, String>, Pair<List<ItemInCart>, Double>> checkoutResponse = this.checkout(Cart.builder().sessionId(1).itemsInCart(itemInCartList).build(), isParallelStream);
 
         Pair<CheckoutResponse, String> response = checkoutResponse.getLeft();
         stopWatch.stop();
@@ -77,7 +86,7 @@ public class CheckoutService {
     }
 
     public static void main(String[] args) {
-        System.out.println(Runtime.getRuntime().availableProcessors());
+        System.out.println(Arrays.asList("Bhaskar Sarma".toCharArray()).parallelStream().map(String::valueOf).collect(Collectors.joining()));
     }
 
 }
