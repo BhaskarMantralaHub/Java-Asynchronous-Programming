@@ -39,3 +39,8 @@ System.out.println("\ntestWith parallel Streams & Fork join response time in ms 
 ```
 
 #### Output: testWith parallel Streams & Fork join response time in ms is 6
+
+# Parallel Stream - Preserve Order
+
+* List - preserves order
+* Set - Doesn't preserve order
