@@ -14,7 +14,7 @@
 
 # Parallel Stream
 * arrays, ArrayLists, and IntStreams are good sources for parallel streams, while LinkedLists, Streams from IO sources, and stateful operations are not.
-* Don't use this when you have unboxing step in stream (Wrapper to primitive type. Example: Integer to int)
+* Don't use this when you have unboxing or boxing step in stream (Wrapper to primitive type. Example: Integer to int)
 * Expensive because ThreadPool size cannot be controlled and probably current thread can also be used
   * it uses JVM’s common fork-join thread pool: ForkJoinPool.common()
   * And if we execute long-running tasks on a parallel stream, there is a high probability that it will use all threads in the common thread pool. Consequently, it will block all other parallel stream operations in the application.
