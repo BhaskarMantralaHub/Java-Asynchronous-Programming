@@ -53,6 +53,7 @@ itemInCartList.stream().map(itemInCart -> itemInCart.getPrice() * itemInCart.get
 
 ```
 
+### on Strings (collect)
 ```java
 Arrays.asList("Bhaskar Sarma".toCharArray()).parallelStream().map(String::valueOf).collect(Collectors.joining())
 ```
