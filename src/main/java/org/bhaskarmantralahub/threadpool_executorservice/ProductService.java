@@ -16,15 +16,19 @@ public class ProductService {
     public Product getProductDetails(int productId) throws ExecutionException, InterruptedException, TimeoutException {
         stopWatch.start();
         ProductInfoService productService = new ProductInfoService();
-        Future<Pair<Integer, ProductDetails>> product = executorService.submit(() -> productService.getProduct(productId));
-
+        //start two asynchronous tasks
+        Future<Pair<Integer, ProductDetails>> productDetails = executorService.submit(() -> productService.getProduct(productId));
         ProductReviewService productReviewService = new ProductReviewService();
         Future<Pair<Integer, Review>> reviewForTheProduct = executorService.submit(() -> productReviewService.getReviewForTheProduct(productId));
         executorService.shutdown();
+
+        ProductDetails details = productDetails.get(2, TimeUnit.SECONDS).getRight();
+        Review review = reviewForTheProduct.get().getRight();
+        Product product = new Product(details, review);
         stopWatch.stop();
 
         log.info("Total time taken to get product details " + stopWatch.getTime()); //INFO: Total time taken to get product details 10
-        return new Product(product.get(2, TimeUnit.SECONDS).getRight(), reviewForTheProduct.get().getRight());
+        return product;
     }
 
     public static void main(String[] args) throws ExecutionException, InterruptedException, TimeoutException {

@@ -16,7 +16,7 @@ public class ProductReviewService {
 
     public Pair<Integer, Review> getReviewForTheProduct(int productId) {
         fixedPause(1000);
-
+        System.out.println("Inside getReviewForTheProduct Method");
         return productList
                 .stream()
                 .filter(product -> product.getLeft() == productId)

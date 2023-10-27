@@ -16,7 +16,7 @@ public class ProductInfoService {
 
     public Pair<Integer, ProductDetails> getProduct(int productId) {
         fixedPause(1000);
-
+        System.out.println("Inside getProduct Method");
         return productList
                 .stream()
                 .filter(product -> product.getLeft() == productId)
